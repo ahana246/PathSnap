@@ -26,7 +26,8 @@ def main():
     print("\n[2] CANDIDATE GENERATION")
     if cand_path.exists():
         for _, r in pd.read_csv(cand_path).iterrows():
-            print(f"  {r['partition']}: {r['observations']} obs, {r['mean_candidates_per_obs']} candidates/obs, "
+            print(f"  {r['partition']}: {r['observations']} obs ({r['unlabelled_pct']:.2f}% not covered by route), "
+                  f"{r['mean_candidates_per_obs']} candidates/obs, "
                   f"miss rate {r['candidate_miss_rate'] * 100:.2f}%, nearest arc is true arc "
                   f"{r['true_arc_is_nearest_pct']:.2f}%")
     else:

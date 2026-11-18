@@ -9,20 +9,29 @@ from features.feature_builder import build_multi_trip_dataset
 
 def candidate_report(df, partition):
     # per observation: was the reference arc among the candidates, and at which distance rank
-    obs = df.groupby(['trip_id', 'obs_idx']).agg(hit=('target', 'max'), n_cands=('arc_id', 'size'))
-    true_rows = df[df['target'] == 1]
+    all_obs = df.groupby(['trip_id', 'obs_idx']).agg(true_arc=('true_arc', 'first'), n_cands=('arc_id', 'size'))
+    labelled = df[df['true_arc'] >= 0]  # unlabelled points (not covered by the route) are left out
+    obs = labelled.groupby(['trip_id', 'obs_idx']).agg(hit=('target', 'max'), n_cands=('arc_id', 'size'))
+    true_rows = labelled[labelled['target'] == 1]
 
-    per_trip = obs.groupby('trip_id').agg(observations=('hit', 'size'), hits=('hit', 'sum')).reset_index()
-    per_trip['candidate_miss_rate'] = 1 - per_trip['hits'] / per_trip['observations']
+    per_trip = all_obs.groupby('trip_id').agg(observations=('true_arc', 'size'),
+                                              unlabelled=('true_arc', lambda s: (s < 0).sum()))
+    per_trip['hits'] = obs.groupby('trip_id')['hit'].sum()
+    per_trip['hits'] = per_trip['hits'].fillna(0).astype(int)
+    per_trip['candidate_miss_rate'] = 1 - per_trip['hits'] / (per_trip['observations'] - per_trip['unlabelled'])
+    per_trip = per_trip.reset_index()
     per_trip['partition'] = partition
 
     summary = {
         'partition': partition,
         'trips': df['trip_id'].nunique(),
-        'observations': len(obs),
+        'observations': len(all_obs),
+        'unlabelled_observations': int((all_obs['true_arc'] < 0).sum()),
+        'unlabelled_pct': round((all_obs['true_arc'] < 0).mean() * 100, 2),
+        'labelled_observations': len(obs),
         'candidate_rows': len(df),
         'mean_candidates_per_obs': round(obs['n_cands'].mean(), 2),
-        'positive_row_pct': round(df['target'].mean() * 100, 2),
+        'positive_row_pct': round(labelled['target'].mean() * 100, 2),
         'candidate_miss_rate': round(1 - obs['hit'].mean(), 4),
         'true_arc_is_nearest_pct': round((true_rows['dist_rank'] == 0).sum() / len(obs) * 100, 2),
         'true_arc_median_dist_m': round(true_rows['dist_to_segment'].median(), 2),

@@ -1,0 +1,28 @@
+{
+  "model": "Hist_Gradient_Boosting",
+  "tuned": true,
+  "params": {
+    "learning_rate": 0.02674793340162785,
+    "max_iter": 300,
+    "max_depth": 9,
+    "max_leaf_nodes": 43,
+    "min_samples_leaf": 82,
+    "l2_regularization": 0.8650532754223389
+  },
+  "features": [
+    "dist_to_segment",
+    "dist_to_from",
+    "dist_to_to",
+    "proj_ratio",
+    "segment_length",
+    "heading_diff",
+    "sin_heading_diff",
+    "cos_heading_diff",
+    "gps_speed",
+    "dt",
+    "dist_rank",
+    "dist_minus_best",
+    "num_candidates"
+  ],
+  "seed": 42
+}

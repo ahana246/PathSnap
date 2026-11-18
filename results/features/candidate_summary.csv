@@ -1,3 +1,3 @@
-partition,trips,observations,candidate_rows,mean_candidates_per_obs,positive_row_pct,candidate_miss_rate,true_arc_is_nearest_pct,true_arc_median_dist_m,true_arc_p95_dist_m,radius_m,max_candidates
-train,80,104229,605824,5.81,15.15,0.1193,48.62,5.11,22.34,50.0,8
-student_test,10,19160,113543,5.93,16.07,0.0478,50.85,5.3,16.89,50.0,8
+partition,trips,observations,unlabelled_observations,unlabelled_pct,labelled_observations,candidate_rows,mean_candidates_per_obs,positive_row_pct,candidate_miss_rate,true_arc_is_nearest_pct,true_arc_median_dist_m,true_arc_p95_dist_m,radius_m,max_candidates
+train,80,104229,11289,10.83,92940,605824,5.71,17.25,0.0144,55.36,4.99,17.46,50.0,8
+student_test,10,19160,27,0.14,19133,113543,5.93,16.7,0.0095,51.78,5.31,17.13,50.0,8

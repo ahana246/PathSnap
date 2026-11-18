@@ -40,9 +40,32 @@ Run every script from the project root with `python -m` so the folders import ea
 | 5. Phase 1 summary | `python -m data_processing.phase1_summary` | console summary |
 | 6. Train + compare 5 models | `python -m models.train_models` | `results/models/model_comparison.csv`, `cv_folds.csv`, `history_*.csv`, `predictions/`, `plots/` |
 | 7. Comparison plots | `python -m models.plot_model_comparison` | `results/models/plots/*.png` |
+| 8. Bayesian tuning | `python -m tuning.bayesian_optimisation --trials 20` | `results/tuning/optuna_trials.csv`, `best_params.json` |
+| 9. Tuned vs untuned + export | `python -m tuning.export_model` | `results/tuning/tuned_vs_untuned.csv`, `artifacts/final_model.joblib`, `artifacts/model_config.json` |
+| 10. HMM decoder tuning | `python -m hmm.tune_hmm` | `results/hmm/decoder_tuning.csv`, `artifacts/hmm_config.json` |
+| 11. Classifier vs HMM | `python -m hmm.evaluate_hmm` | `results/hmm/classifier_vs_hmm.csv`, `per_trip.csv`, `student_test_predictions.parquet` |
+| 12. Prediction maps | `python -m visualisation.prediction_maps` | `results/maps/prediction_*.html` |
 
-Key settings (candidate radius, max candidates, seed, folds) are in `config.py`.
+Key settings (candidate radius, max candidates, HMM gap split, seed, folds) are in `config.py`. The `artifacts/` folder already holds the trained model and HMM settings, so the API can run without repeating steps 1–12.
 
-## Deployment
+## Deployment (two laptops)
 
-Laptop 1 (API) and Laptop 2 (UI) instructions are added once the API and UI are built.
+Both laptops need the repo and `pip install -r requirements.txt`, and must be on the same network.
+
+**Laptop 1: API server.** Put the `evaluator_test/` folder (10 trips) in the project root, then:
+
+```bash
+python -m api.main
+```
+
+The API listens on port 8000 on all network interfaces and serves the trips in `evaluator_test/`. Use `--data-dir student_test` to rehearse with the student-test trips. Every request is logged in this window. Find this laptop's IP address with `ipconfig` (Windows) and allow Python through the firewall when Windows asks.
+
+**Laptop 2: UI.**
+
+```bash
+streamlit run ui/app.py
+```
+
+Open the page it prints (http://localhost:8501), enter `http://<laptop-1-ip>:8000` as the API address in the sidebar, choose one of the ten trips and click **Run map matching**. The UI shows the predicted route on a map and the accuracy computed by the API.
+
+The reference routes stay on laptop 1: the API only uses them to score the prediction and never sends them to the UI.

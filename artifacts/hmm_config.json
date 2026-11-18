@@ -1,0 +1,6 @@
+{
+  "beta": 5.0,
+  "unreachable_log": -160.0,
+  "chosen_by": "highest Top-1 on 20 train trips with out-of-fold probabilities",
+  "train_top1": 0.937
+}
